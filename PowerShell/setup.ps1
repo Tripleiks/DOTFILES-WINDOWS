@@ -42,8 +42,17 @@
     get the prompt, zoxide, PSReadLine, Terminal-Icons, and the font.
 
 .PARAMETER SkipFont
-    Don't install the JetBrains Mono Nerd Font. Use if you already have a
-    Nerd Font installed, or you manage fonts via another channel.
+    Don't install any Nerd Fonts. Use if you already have one installed,
+    or you manage fonts via another channel.
+
+.PARAMETER Fonts
+    Nerd Font families to install (user scope, via `oh-my-posh font install`).
+    Defaults to the common five: JetBrainsMono, FiraCode, Meslo, CascadiaCode,
+    Hack. Pass an empty array (-Fonts @()) to skip all without disabling
+    -SkipFont. Examples:
+        -Fonts JetBrainsMono           # only that one
+        -Fonts JetBrainsMono,FiraCode  # only two
+        -Fonts @()                     # none (same as -SkipFont)
 
 .PARAMETER NoAdmin
     Avoid actions that need administrator rights. Telemetry opt-out is
@@ -81,7 +90,8 @@ param(
     [switch]$SkipFont,
     [switch]$NoAdmin,
     [switch]$NoAdminModules,
-    [switch]$NoRSAT
+    [switch]$NoRSAT,
+    [string[]]$Fonts = @('JetBrainsMono','FiraCode','Meslo','CascadiaCode','Hack')
 )
 
 $ErrorActionPreference = 'Stop'
@@ -202,19 +212,51 @@ if (-not $Minimal) {
 }
 
 # -----------------------------------------------------------------------------
-# 3. Nerd Font (JetBrainsMono) via oh-my-posh.
+# 3. Nerd Fonts via oh-my-posh. Idempotent: skips families already installed
+#    in the user-scope Windows font folder.
 # -----------------------------------------------------------------------------
-if (-not $SkipFont) {
-    if (Has-Command 'oh-my-posh') {
-        Write-Step 'Installing JetBrainsMono Nerd Font'
-        try {
-            oh-my-posh font install JetBrainsMono --user 2>$null
-            Write-Ok 'JetBrainsMono Nerd Font installed (user scope)'
-        } catch {
-            Write-Warn "Font install failed: $($_.Exception.Message). Install manually from nerdfonts.com."
-        }
+function Test-NerdFontInstalled {
+    param([string]$Family)
+    $userFontDir = Join-Path $env:LOCALAPPDATA 'Microsoft\Windows\Fonts'
+    if (-not (Test-Path $userFontDir)) { return $false }
+
+    # Nerd Fonts renames some families on install (trademark / disambiguation).
+    # Map the install argument to a regex that matches the actual filenames.
+    $pattern = switch -Exact ($Family) {
+        'CascadiaCode' { 'CaskaydiaCove|CaskaydiaMono' }
+        'CascadiaMono' { 'CaskaydiaMono' }
+        'SourceCodePro' { 'SourceCodePro|SauceCodePro' }
+        default        { [regex]::Escape($Family) }
+    }
+    # Match files like "JetBrainsMonoNerdFont-Regular.ttf" or "JetBrainsMonoNL Nerd Font Mono-Regular.ttf".
+    $found = Get-ChildItem $userFontDir -File -ErrorAction SilentlyContinue |
+        Where-Object { $_.Name -match "($pattern).*Nerd" }
+    [bool]$found
+}
+
+if (-not $SkipFont -and $Fonts.Count -gt 0) {
+    if (-not (Has-Command 'oh-my-posh')) {
+        Write-Warn 'oh-my-posh not on PATH yet — re-run setup.ps1 after restarting your shell to install fonts.'
     } else {
-        Write-Warn 'oh-my-posh not on PATH yet — re-run setup.ps1 after restarting your shell to install the font.'
+        foreach ($family in $Fonts) {
+            if (Test-NerdFontInstalled -Family $family) {
+                Write-Skip "$family Nerd Font already installed"
+                continue
+            }
+            Write-Step "Installing $family Nerd Font (user scope, headless)"
+            try {
+                # --headless disables the TUI so the install is non-interactive.
+                # oh-my-posh installs at user scope by default; no admin needed.
+                oh-my-posh font install $family --headless 2>&1 | Out-Null
+                if (Test-NerdFontInstalled -Family $family) {
+                    Write-Ok "$family Nerd Font installed"
+                } else {
+                    Write-Warn "$family install reported no error but font not found in user fonts dir"
+                }
+            } catch {
+                Write-Warn "$family install failed: $($_.Exception.Message)"
+            }
+        }
     }
 }
 

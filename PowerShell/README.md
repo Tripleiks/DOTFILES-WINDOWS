@@ -126,8 +126,23 @@ For managing on-premises and hybrid resources from this workstation:
 - `Rsat.CertificateServices.Tools` - Certificate Authority tools
 - `Rsat.FileServices.Tools` - File Server tools
 
-**Font**
-- JetBrains Mono Nerd Font - so prompt icons render correctly. After install, set your terminal font to it (in Windows Terminal: Settings -> Profile -> Appearance -> Font face).
+**Nerd Fonts (user scope, via oh-my-posh)**
+
+The five most popular Nerd Fonts are installed by default. Pick whichever one you like in Windows Terminal -> Settings -> Profile -> Appearance -> Font face:
+
+- **JetBrainsMono Nerd Font** - default; great all-rounder, mature ligatures
+- **FiraCode Nerd Font** - strong ligatures, very popular
+- **Meslo Nerd Font** - rounded, Powerlevel10k's default recommendation
+- **CascadiaCode Nerd Font** - Microsoft's own (cursive italic support)
+- **Hack Nerd Font** - classic, clean, no ligatures
+
+The installer is idempotent: each family is detected via the user-scope font folder and skipped if already present.
+
+Pick which to install via `-Fonts`:
+```pwsh
+.\setup.ps1 -Fonts JetBrainsMono,Meslo     # just two
+.\setup.ps1 -Fonts @()                      # none (same effect as -SkipFont)
+```
 
 ---
 
