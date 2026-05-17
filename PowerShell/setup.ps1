@@ -153,8 +153,10 @@ if ((Test-Admin) -and (-not $NoAdmin)) {
 # 2. Winget packages.
 # -----------------------------------------------------------------------------
 $essentials = @(
-    'JanDeDobbeleer.OhMyPosh',
-    'ajeetdsouza.zoxide'
+    'Starship.Starship',            # primary prompt engine (Dracula config in themes\)
+    'JanDeDobbeleer.OhMyPosh',      # fallback prompt
+    'ajeetdsouza.zoxide',
+    'Fastfetch-cli.Fastfetch'       # neofetch successor - shown on shell start
 )
 $modernCli = @(
     # Search / view / list

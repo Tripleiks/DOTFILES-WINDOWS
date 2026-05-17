@@ -4,18 +4,21 @@
 # WHAT THIS DOES
 #   Sets up your prompt - the bit that shows your folder, git branch, and
 #   whether the last command succeeded. Tries the following in order:
-#     1. oh-my-posh with the ultimate.omp.json theme  (preferred)
-#     2. starship, if oh-my-posh isn't installed
-#     3. A simple built-in fallback that always works
+#     1. starship      with themes\starship.toml         (Dracula, preferred)
+#     2. oh-my-posh    with themes\ultimate.omp.json     (fallback)
+#     3. A simple built-in prompt                        (always works)
 #
 #   Also initializes zoxide so `z folder-fragment` jumps to recent folders.
 #
-#   Tip: set $env:POSH_THEME to a different .omp.json path to use your own
-#   theme instead of the one shipped in themes/.
+#   Override the engine choice via $env:PROMPT_ENGINE = 'starship' | 'posh' | 'none'.
+#   Point starship at a different config via $env:STARSHIP_CONFIG.
+#   Point oh-my-posh at a different theme via $env:POSH_THEME.
 # =============================================================================
 
-# Look for the theme: $env:POSH_THEME (user override), then themes/ultimate.omp.json,
-# then any cobalt2.omp.json kept in $HOME\Documents\PowerShell for CTT-compat.
+# Engine selection order (override with $env:PROMPT_ENGINE = 'starship' | 'posh' | 'none'):
+#   1. starship  (Dracula-themed config from themes/starship.toml)
+#   2. oh-my-posh (themes/ultimate.omp.json)
+#   3. built-in fallback
 function Resolve-PoshTheme {
     if ($env:POSH_THEME -and (Test-Path $env:POSH_THEME)) { return $env:POSH_THEME }
     $candidates = @(
@@ -26,7 +29,26 @@ function Resolve-PoshTheme {
     return $null
 }
 
-if (Test-Command 'oh-my-posh') {
+$engine = if ($env:PROMPT_ENGINE) { $env:PROMPT_ENGINE.ToLower() } else { 'auto' }
+
+# Try starship first when in auto mode, or when explicitly requested.
+$starshipDone = $false
+if (($engine -in 'auto','starship') -and (Test-Command 'starship')) {
+    # Point starship at the shipped Dracula config if STARSHIP_CONFIG isn't already set.
+    $shippedToml = Join-Path $env:PROFILE_ROOT 'themes\starship.toml'
+    if ((Test-Path $shippedToml) -and (-not $env:STARSHIP_CONFIG)) {
+        $env:STARSHIP_CONFIG = $shippedToml
+    }
+    try {
+        Invoke-Expression (& starship init powershell)
+        $starshipDone = $true
+    } catch {
+        Write-Warning "starship init failed: $_"
+    }
+}
+
+# Fall back to oh-my-posh.
+if ((-not $starshipDone) -and ($engine -in 'auto','posh') -and (Test-Command 'oh-my-posh')) {
     $theme = Resolve-PoshTheme
     try {
         if ($theme) {
@@ -39,12 +61,10 @@ if (Test-Command 'oh-my-posh') {
     }
     Remove-Variable theme -ErrorAction SilentlyContinue
 }
-elseif (Test-Command 'starship') {
-    # Honor an existing Starship install if oh-my-posh isn't there yet.
-    try { Invoke-Expression (&starship init powershell) }
-    catch { Write-Warning "starship init failed: $_" }
+elseif ((-not $starshipDone) -and ($engine -eq 'none')) {
+    # Explicit user request: leave the built-in prompt alone.
 }
-else {
+elseif (-not $starshipDone) {
     # Fallback prompt — minimal but informative when no third-party prompt exists.
     function Global:prompt {
         $lastOk    = $?
@@ -77,3 +97,4 @@ if (Test-Command 'zoxide') {
 }
 
 Remove-Item function:Resolve-PoshTheme -ErrorAction SilentlyContinue
+Remove-Variable engine, starshipDone, shippedToml -ErrorAction SilentlyContinue

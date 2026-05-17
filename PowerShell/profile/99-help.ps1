@@ -123,4 +123,8 @@ ${dim}to see load timing on next shell start.${reset}
 "@
 }
 
-Write-Host "Type 'Show-Help' for a quick reference." -ForegroundColor DarkGray
+# The welcome box (95-welcome.ps1) already surfaces Show-Help via its tip-of-the-day
+# pool. Only print the standalone hint when the welcome box is suppressed.
+if ($env:WELCOME_NO_BOX) {
+    Write-Host "Type 'Show-Help' for a quick reference." -ForegroundColor DarkGray
+}

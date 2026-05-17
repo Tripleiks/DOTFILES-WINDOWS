@@ -54,8 +54,10 @@ The setup script installs (or skips, if already present):
 **Tools (via winget)**
 
 *Always installed*
-- `oh-my-posh` - the prompt
+- `starship` - the primary prompt (Dracula theme ships in `themes/starship.toml`)
+- `oh-my-posh` - fallback prompt if starship is missing
 - `zoxide` - `z folder-fragment` jumps to any folder you have visited
+- `fastfetch` - neofetch successor; prints a system summary on shell start
 
 *Skipped with `-Minimal`*
 - `eza`, `bat`, `ripgrep` (`rg`), `fd` - modern listings, paging, searching
@@ -227,6 +229,23 @@ Run `Show-Help` in a shell for the live, colour-coded version. Below is the full
 | `glow <file.md>`                   | Render Markdown in the terminal                       |
 | `difft <a> <b>`                    | Syntax-aware diff (difftastic). Try `git config --global diff.external difft` |
 | `hyperfine <cmd>`                  | Benchmark a command's runtime                         |
+
+### Startup look & feel
+
+- **Starship prompt** in Dracula colors, shipped in `themes/starship.toml`. Switch engines with `$env:PROMPT_ENGINE = 'starship' | 'posh' | 'none'`.
+- **fastfetch** prints a system summary every time you open a shell.
+- **Welcome box** below fastfetch shows a greeting, date/time in German, weather for Hamburg (cached 5 min), system info, and a daily tip. Tweak via env vars:
+
+| Env var | Default | What it does |
+|---|---|---|
+| `WELCOME_NO_FASTFETCH` | unset | Skip fastfetch on shell start |
+| `WELCOME_NO_BOX` | unset | Skip the welcome box |
+| `WELCOME_NO_WEATHER` | unset | Keep the box but drop the weather block |
+| `WELCOME_CITY` | `Hamburg` | City for the wttr.in lookup |
+| `WELCOME_LANG` | `de` | `de` or `en` |
+| `WELCOME_WIDTH` | `72` | Inner width of the box |
+
+Run `Show-Welcome` to reprint the box on demand.
 
 ### Keyboard niceties
 
