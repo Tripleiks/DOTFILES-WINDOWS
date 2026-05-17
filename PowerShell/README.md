@@ -20,13 +20,31 @@ Anyone on the team who wants a comfortable PowerShell. You do not need to be a "
 
 ## How to install
 
+### One-liner (recommended)
+
+Open PowerShell on a fresh machine and paste:
+
 ```pwsh
-git clone https://github.com/<your-org>/DOTFILES-WINDOWS C:\GitHub\DOTFILES-WINDOWS
+irm https://raw.githubusercontent.com/Tripleiks/DOTFILES-WINDOWS/main/bootstrap.ps1 | iex
+```
+
+That installs git if missing, clones this repo to `%USERPROFILE%\GitHub\DOTFILES-WINDOWS`, then runs `setup.ps1` for you.
+
+If you want pass-through flags (e.g. skip the heavy enterprise modules):
+
+```pwsh
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/Tripleiks/DOTFILES-WINDOWS/main/bootstrap.ps1))) -NoAdminModules -NoRSAT
+```
+
+### Manual
+
+```pwsh
+git clone https://github.com/Tripleiks/DOTFILES-WINDOWS C:\GitHub\DOTFILES-WINDOWS
 cd C:\GitHub\DOTFILES-WINDOWS\PowerShell
 .\setup.ps1
 ```
 
-Then open a new PowerShell window. You should see the new prompt and a one-line hint telling you to type `Show-Help`.
+Then open a new PowerShell window. You should see fastfetch, the welcome box, then the new prompt.
 
 **Safe to re-run.** The setup skips anything you already have, so running it again is harmless.
 
