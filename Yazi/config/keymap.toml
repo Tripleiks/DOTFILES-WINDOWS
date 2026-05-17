@@ -1,0 +1,21 @@
+# keymap.toml — Yazi keybinding overrides
+#
+# Reference: https://yazi-rs.github.io/docs/configuration/keymap
+#
+# Yazi ships with sensible default keybindings. Anything declared here is
+# merged on top of the defaults; clear a binding by setting run = "".
+#
+# This file is symlinked from the repo into %APPDATA%\yazi\config\keymap.toml
+# by Yazi\install.ps1. Edit here, never in %APPDATA%.
+
+# Example overrides (uncomment to enable):
+#
+# [[mgr.prepend_keymap]]
+# on   = [ "g", "h" ]
+# run  = "cd ~"
+# desc = "Go home"
+#
+# [[mgr.prepend_keymap]]
+# on   = [ "g", "d" ]
+# run  = "cd ~/Downloads"
+# desc = "Go to Downloads"

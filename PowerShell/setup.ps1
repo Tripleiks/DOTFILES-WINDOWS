@@ -202,7 +202,10 @@ $modernCli = @(
     'sharkdp.hyperfine',            # benchmark commands
 
     # Quick command examples
-    'tldr-pages.tlrc'               # `tldr <cmd>` cheat sheets
+    'tldr-pages.tlrc',              # `tldr <cmd>` cheat sheets
+
+    # TUI file manager
+    'sxyazi.yazi'                   # terminal file manager (profile adds `y` cd-on-exit wrapper)
 )
 
 Write-Step 'Installing winget packages'
@@ -365,6 +368,17 @@ if (Test-Path $installScript) {
     & $installScript
 } else {
     Write-Warn "install.ps1 not found next to setup.ps1 — wire the profile manually."
+}
+
+# -----------------------------------------------------------------------------
+# 8. Link auxiliary tool configs (Yazi, etc.). Each lives in a sibling folder
+#    with its own install.ps1. Skipped silently if the folder isn't present.
+# -----------------------------------------------------------------------------
+$repoRoot = Split-Path -Parent $PSScriptRoot
+$yaziInstall = Join-Path $repoRoot 'Yazi\install.ps1'
+if (Test-Path $yaziInstall) {
+    Write-Step 'Linking Yazi config via Yazi\install.ps1'
+    try { & $yaziInstall } catch { Write-Warn "Yazi install reported: $($_.Exception.Message)" }
 }
 
 Write-Host ''

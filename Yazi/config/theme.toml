@@ -1,0 +1,17 @@
+# theme.toml — Yazi theme
+#
+# Reference: https://yazi-rs.github.io/docs/configuration/theme
+#
+# Two ways to set a theme:
+#
+# 1) Install a community flavor with the package manager (recommended):
+#       ya pkg add yazi-rs/flavors:catppuccin-mocha
+#    then point this file at it:
+#       [flavor]
+#       dark = "catppuccin-mocha"
+#
+# 2) Edit colors directly with [mgr], [status], [mode], [select], [tab],
+#    [which], [help], [filetype], etc.
+#
+# This file is symlinked from the repo into %APPDATA%\yazi\config\theme.toml
+# by Yazi\install.ps1. Edit here, never in %APPDATA%.
