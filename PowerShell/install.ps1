@@ -1,4 +1,4 @@
-#requires -Version 5.1
+﻿#requires -Version 5.1
 <#
 .SYNOPSIS
     Wires the Ultimate PowerShell Profile into every PowerShell window on this PC.

@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 <#
 .SYNOPSIS
     One-shot installer for DOTFILES-WINDOWS. Installs git (if missing),
