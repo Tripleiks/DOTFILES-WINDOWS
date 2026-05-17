@@ -75,6 +75,16 @@ function Global:k9 {
         Stop-Process -Force -ErrorAction SilentlyContinue
 }
 
+# `top` — interactive system monitor. Uses `bottom` (btm) if installed,
+# otherwise falls back to a one-shot snapshot of the top 20 CPU consumers.
+function Global:top {
+    if (Test-Command 'btm') { btm @args; return }
+    Get-Process | Sort-Object -Property CPU -Descending |
+        Select-Object -First 20 Id, ProcessName,
+            @{n='CPU';e={[math]::Round([double]($_.CPU),1)}},
+            @{n='MemMB';e={[int]($_.WorkingSet64/1MB)}}
+}
+
 # Profile management.
 function Global:Edit-Profile { & $Global:EDITOR (Join-Path $env:PROFILE_ROOT 'Microsoft.PowerShell_profile.ps1') }
 Set-Alias -Name ep -Value Edit-Profile -Scope Global -Force

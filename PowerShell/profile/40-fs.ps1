@@ -107,9 +107,15 @@ function Global:which {
 }
 
 # Disk usage — folder size in human-readable form.
+# Prefers `dust` (modern visual du) when installed; falls back to a built-in
+# implementation so the command always works.
 function Global:du {
     [CmdletBinding()]
     param([string]$Path = '.', [switch]$Summary)
+    if ((Test-Command 'dust') -and (-not $Summary)) {
+        dust $Path
+        return
+    }
     $items = if ($Summary) {
         Get-ChildItem -Path $Path -Force -ErrorAction SilentlyContinue
     } else {
@@ -126,7 +132,9 @@ function Global:du {
 }
 
 # Disk free — top-level overview of all filesystem drives.
+# Prefers `duf` (modern visual df) when installed; falls back to Get-PSDrive.
 function Global:df {
+    if (Test-Command 'duf') { duf @args; return }
     Get-PSDrive -PSProvider FileSystem | ForEach-Object {
         [pscustomobject]@{
             Drive = $_.Name

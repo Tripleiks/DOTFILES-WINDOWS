@@ -91,3 +91,8 @@ function Global:groot    { Set-Location (git rev-parse --show-toplevel) }
 # Jump to GitHub root (CTT used `g` for this; we use `ghub` to avoid clashing
 # with the gh CLI directory-jump function in 50-system.ps1).
 function Global:ghub { Set-Location $Global:GITHUB_ROOT }
+
+# `lg` — full-screen git TUI. Only defined if lazygit is installed.
+if (Test-Command 'lazygit') {
+    function Global:lg { lazygit @args }
+}

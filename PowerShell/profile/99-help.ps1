@@ -66,6 +66,7 @@ ${section}Listing & files (eza if installed)${reset}
 ${section}System & process${reset}
   ${command}uptime${reset}                   ${accent}→${reset} ${desc}boot time + duration${reset}
   ${command}sysinfo${reset}                  ${accent}→${reset} ${desc}host / OS / CPU / memory summary${reset}
+  ${command}top${reset}                      ${accent}→${reset} ${desc}interactive monitor (bottom / btm) or top-20 snapshot${reset}
   ${command}pgrep <regex>${reset}            ${accent}→${reset} ${desc}list matching processes${reset}
   ${command}pkill <regex> [-Force]${reset}   ${accent}→${reset} ${desc}interactive kill${reset}
   ${command}k9 <regex>${reset}               ${accent}→${reset} ${desc}force kill all matches${reset}
@@ -101,11 +102,20 @@ ${section}Git${reset}
   ${command}gst / gstp / gstl${reset}        ${accent}→${reset} ${desc}stash / pop / list${reset}
   ${command}gr / grh / grs${reset}           ${accent}→${reset} ${desc}reset / reset --hard / restore${reset}
   ${command}gremotes / groot${reset}         ${accent}→${reset} ${desc}list remotes / cd repo root${reset}
+  ${command}lg${reset}                       ${accent}→${reset} ${desc}lazygit — full-screen git TUI (if installed)${reset}
 
 ${section}Editor & misc${reset}
   ${command}edit <file>${reset}              ${accent}→${reset} ${desc}open in \$EDITOR (nvim/code/notepad)${reset}
   ${command}F7 (in PSReadLine)${reset}       ${accent}→${reset} ${desc}history grid picker${reset}
   ${command}Ctrl+t / Ctrl+r (with PSFzf)${reset} ${accent}→${reset} ${desc}file / history fuzzy pick${reset}
+
+${section}External tools (installed by setup.ps1; call directly)${reset}
+  ${command}tldr <cmd>${reset}               ${accent}→${reset} ${desc}one-screen cheat sheet for any command${reset}
+  ${command}jq / yq${reset}                  ${accent}→${reset} ${desc}query / transform JSON / YAML${reset}
+  ${command}xh <url>${reset}                 ${accent}→${reset} ${desc}friendlier curl / Invoke-WebRequest${reset}
+  ${command}glow <file.md>${reset}           ${accent}→${reset} ${desc}render markdown in the terminal${reset}
+  ${command}difft <a> <b>${reset}            ${accent}→${reset} ${desc}syntax-aware diff (difftastic)${reset}
+  ${command}hyperfine <cmd>${reset}          ${accent}→${reset} ${desc}benchmark a command${reset}
 
 ${dim}─────────────────────────────────────────────────────────────${reset}
 ${dim}Type Show-Help to print this again. Set \$env:PROFILE_VERBOSE=1${reset}

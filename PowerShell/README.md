@@ -52,13 +52,26 @@ If you have already installed the tools yourself and only want to wire the profi
 The setup script installs (or skips, if already present):
 
 **Tools (via winget)**
+
+*Always installed*
 - `oh-my-posh` - the prompt
 - `zoxide` - `z folder-fragment` jumps to any folder you have visited
+
+*Skipped with `-Minimal`*
 - `eza`, `bat`, `ripgrep` (`rg`), `fd` - modern listings, paging, searching
 - `fzf` - fuzzy finder (Ctrl+T for files, Ctrl+R for history)
-- `delta` - colourful git diffs
+- `delta` - colourful git diffs in your pager
+- `lazygit` - full-screen git interface (alias: `lg`)
+- `difftastic` - syntax-aware diff (`difft`)
 - `gsudo` - a `sudo` for Windows
+- `bottom` - system monitor (alias: `top` -> `btm`)
 - `gh` - GitHub CLI
+- `jq` / `yq` - query/transform JSON / YAML
+- `dust` / `duf` - prettier `du` / `df` (the built-in `du`/`df` use these automatically when installed)
+- `xh` - friendlier `curl` / `Invoke-WebRequest`
+- `glow` - render markdown in the terminal
+- `hyperfine` - benchmark commands
+- `tldr` - one-screen cheat sheets for any command
 
 **PowerShell modules**
 - `PSReadLine` - autocomplete and history search
@@ -120,6 +133,7 @@ Run `Show-Help` in a shell for the live, colour-coded version. Below is the full
 | ---------------------- | ------------------------------------------------------------- |
 | `uptime`               | How long since the last reboot                                |
 | `sysinfo`              | OS, CPU, RAM, and shell summary                               |
+| `top`                  | Interactive monitor (`bottom`/`btm`) or top-20 snapshot       |
 | `pgrep <name>`         | List running processes whose name matches a pattern           |
 | `pkill <name>`         | Stop matching processes (asks before each one)                |
 | `k9 <name>`            | Force-stop all matching processes (no prompt)                 |
@@ -163,6 +177,7 @@ Run `Show-Help` in a shell for the live, colour-coded version. Below is the full
 | `gst` / `gstp` / `gstl`            | stash / stash pop / stash list                        |
 | `gcl <url>`                        | clone                                                 |
 | `gremotes` / `groot`               | list remotes / cd to repo root                        |
+| `lg`                               | lazygit - full-screen git TUI (if installed)          |
 
 ### Profile management
 
@@ -174,6 +189,17 @@ Run `Show-Help` in a shell for the live, colour-coded version. Below is the full
 | `reload`                   | Re-load the profile after edits                         |
 | `Update-Profile`           | `git pull` the dotfiles repo and reload                 |
 | `edit <file>`              | Open a file in your preferred editor                    |
+
+### External tools (installed by `setup.ps1`, call directly)
+
+| Type this                          | What it does                                          |
+| ---------------------------------- | ----------------------------------------------------- |
+| `tldr <cmd>`                       | One-screen cheat sheet for any command                |
+| `jq` / `yq`                        | Query and transform JSON / YAML                       |
+| `xh <url>`                         | Friendlier alternative to `curl` / `Invoke-WebRequest` |
+| `glow <file.md>`                   | Render Markdown in the terminal                       |
+| `difft <a> <b>`                    | Syntax-aware diff (difftastic). Try `git config --global diff.external difft` |
+| `hyperfine <cmd>`                  | Benchmark a command's runtime                         |
 
 ### Keyboard niceties
 

@@ -123,14 +123,40 @@ $essentials = @(
     'ajeetdsouza.zoxide'
 )
 $modernCli = @(
-    'junegunn.fzf',
-    'sharkdp.bat',
-    'eza-community.eza',
-    'BurntSushi.ripgrep.MSVC',
-    'sharkdp.fd',
-    'dandavison.delta',
-    'gerardog.gsudo',
-    'GitHub.cli'
+    # Search / view / list
+    'junegunn.fzf',                 # fuzzy finder (Ctrl+T / Ctrl+R via PSFzf)
+    'sharkdp.bat',                  # syntax-highlighted `cat`
+    'eza-community.eza',            # colourful `ls`/`tree`
+    'BurntSushi.ripgrep.MSVC',      # fast `grep`
+    'sharkdp.fd',                   # fast `find`
+
+    # Git ecosystem
+    'dandavison.delta',             # colourful diff pager
+    'JesseDuffield.lazygit',        # full-screen git TUI (alias: lg)
+    'Wilfred.difftastic',           # syntax-aware diff (difft)
+
+    # System & elevation
+    'gerardog.gsudo',               # sudo-like elevation
+    'Clement.bottom',               # btop/htop-style monitor (alias: top -> btm)
+
+    # GitHub
+    'GitHub.cli',                   # gh
+
+    # JSON / YAML
+    'jqlang.jq',                    # JSON query
+    'MikeFarah.yq',                 # YAML query (also handles JSON)
+
+    # Disk usage (du / df get auto-upgraded if these are present)
+    'bootandy.dust',
+    'muesli.duf',
+
+    # HTTP / docs / measurement
+    'ducaale.xh',                   # friendlier curl / Invoke-WebRequest
+    'charmbracelet.glow',           # render markdown in the terminal
+    'sharkdp.hyperfine',            # benchmark commands
+
+    # Quick command examples
+    'tldr-pages.tlrc'               # `tldr <cmd>` cheat sheets
 )
 
 Write-Step 'Installing winget packages'
