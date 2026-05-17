@@ -1,0 +1,17 @@
+# Claude Code: personal permission state - never share.
+.claude/settings.local.json
+
+# install.ps1 makes timestamped backups when replacing existing profiles.
+*.bak.*
+
+# Common editor / OS noise.
+.vs/
+.vscode/*.log
+*.swp
+*~
+Thumbs.db
+desktop.ini
+$RECYCLE.BIN/
+
+# PowerShell module caches.
+PSReadLine_history.txt
