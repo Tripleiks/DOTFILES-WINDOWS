@@ -35,3 +35,12 @@ max_height    = 900
 image_delay   = 30
 image_filter  = "triangle"
 image_quality = 75
+
+# Route image/* through the vendored chafa-preview plugin instead of yazi's
+# built-in image driver. Windows Terminal advertises Sixel in DA1 but doesn't
+# visibly render it in the preview pane, so we bypass the auto-picked driver.
+# Plugin lives in repo at Yazi\plugins\chafa-preview.yazi\, symlinked into
+# %APPDATA%\yazi\plugins\ by Yazi\install.ps1. Requires chafa on PATH.
+[[plugin.prepend_previewers]]
+mime = "image/*"
+run  = "chafa-preview"

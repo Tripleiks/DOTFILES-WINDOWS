@@ -205,7 +205,8 @@ $modernCli = @(
     'tldr-pages.tlrc',              # `tldr <cmd>` cheat sheets
 
     # TUI file manager
-    'sxyazi.yazi'                   # terminal file manager (profile adds `y` cd-on-exit wrapper)
+    'sxyazi.yazi',                  # terminal file manager (profile adds `y` cd-on-exit wrapper)
+    'hpjansson.Chafa'               # ASCII/Unicode image renderer — yazi's fallback image previewer
 )
 
 Write-Step 'Installing winget packages'
