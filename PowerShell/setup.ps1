@@ -5,16 +5,27 @@
     wires the profile in.
 
 .DESCRIPTION
-    This is the one-shot installer. In plain English it does five things:
+    This is the one-shot installer. In plain English it does seven things:
       1. Sets two environment variables that opt out of telemetry
          (POWERSHELL_TELEMETRY_OPTOUT and DOTNET_CLI_TELEMETRY_OPTOUT).
       2. Uses winget to install the prompt (oh-my-posh), zoxide, and a
          handful of modern command-line tools (eza, bat, ripgrep, fd,
-         fzf, delta, gsudo, gh). Skips anything you already have.
+         fzf, delta, lazygit, difftastic, gsudo, bottom, gh, jq, yq,
+         dust, duf, xh, glow, hyperfine, tldr). Skips anything you
+         already have.
       3. Installs the JetBrains Mono Nerd Font so prompt icons render.
-      4. Installs PowerShell modules (PSReadLine, Terminal-Icons,
-         posh-git, PSFzf) from PSGallery.
-      5. Runs install.ps1 to wire the profile into your PowerShell paths.
+      4. Installs the core PowerShell modules used by the profile
+         (PSReadLine, Terminal-Icons, posh-git, PSFzf).
+      5. Installs the M365 / Azure / hybrid admin modules from PSGallery
+         (Microsoft.Graph, Az, ExchangeOnlineManagement, MicrosoftTeams,
+         Microsoft.Online.SharePoint.PowerShell, PnP.PowerShell,
+         PSWindowsUpdate, ImportExcel). These are large - skip with
+         -NoAdminModules if not needed.
+      6. When running elevated, installs the RSAT capabilities for
+         Active Directory, DNS, DHCP, Group Policy, and Server Manager
+         using Add-WindowsCapability. Required to manage AD / hybrid
+         environments from this workstation.
+      7. Runs install.ps1 to wire the profile into your PowerShell paths.
 
     The installer is idempotent - re-running it is safe. Anything already
     installed is detected and skipped.
@@ -22,10 +33,13 @@
     After it finishes, open a new PowerShell window (or run `reload` in an
     existing one) to load the profile.
 
+    Note: AzureAD and MSOnline are NOT installed - they are deprecated by
+    Microsoft and replaced by Microsoft.Graph. Use Microsoft.Graph instead.
+
 .PARAMETER Minimal
     Skip the modern CLI tools (eza, bat, ripgrep, fd, fzf, delta, gsudo, gh)
-    and the optional modules (posh-git, PSFzf). You'll still get the prompt,
-    zoxide, PSReadLine, Terminal-Icons, and the font.
+    AND the enterprise admin modules AND the RSAT capabilities. You'll still
+    get the prompt, zoxide, PSReadLine, Terminal-Icons, and the font.
 
 .PARAMETER SkipFont
     Don't install the JetBrains Mono Nerd Font. Use if you already have a
@@ -33,21 +47,41 @@
 
 .PARAMETER NoAdmin
     Avoid actions that need administrator rights. Telemetry opt-out is
-    written at user scope instead of machine scope.
+    written at user scope instead of machine scope, and RSAT capabilities
+    are skipped (they require elevation).
+
+.PARAMETER NoAdminModules
+    Skip the M365 / Azure / hybrid admin PowerShell modules (Microsoft.Graph,
+    Az, ExchangeOnlineManagement, MicrosoftTeams, SharePoint, PnP, etc.).
+    These can total several gigabytes of disk and take many minutes - omit
+    this flag if you actually administer M365/Azure, otherwise use it.
+
+.PARAMETER NoRSAT
+    Skip the RSAT capabilities (Active Directory, DNS, DHCP, Group Policy,
+    Server Manager). Use on personal machines that won't be managing AD.
 
 .EXAMPLE
     pwsh -File .\setup.ps1
-    The full install. Recommended for most people.
+    The full install for an admin workstation. Includes M365 / Azure
+    modules and (if elevated) RSAT capabilities.
+
+.EXAMPLE
+    pwsh -File .\setup.ps1 -NoAdminModules -NoRSAT
+    Same as the full install but skip the heavyweight enterprise modules.
+    Good for personal / dev laptops.
 
 .EXAMPLE
     pwsh -File .\setup.ps1 -Minimal -SkipFont
-    Just the prompt and history goodies. No modern CLI tools, no font.
+    Just the prompt and history goodies. No modern CLI tools, no admin
+    modules, no RSAT, no font.
 #>
 [CmdletBinding()]
 param(
     [switch]$Minimal,
     [switch]$SkipFont,
-    [switch]$NoAdmin
+    [switch]$NoAdmin,
+    [switch]$NoAdminModules,
+    [switch]$NoRSAT
 )
 
 $ErrorActionPreference = 'Stop'
@@ -183,9 +217,9 @@ if (-not $SkipFont) {
 }
 
 # -----------------------------------------------------------------------------
-# 4. PSGallery modules.
+# 4. PSGallery modules - core profile modules.
 # -----------------------------------------------------------------------------
-Write-Step 'Installing PowerShell modules'
+Write-Step 'Installing core PowerShell modules'
 Install-PSModule -Name PSReadLine      -MinimumVersion '2.2.0'
 Install-PSModule -Name Terminal-Icons
 if (-not $Minimal) {
@@ -194,7 +228,92 @@ if (-not $Minimal) {
 }
 
 # -----------------------------------------------------------------------------
-# 5. Wire the profile into PS 5.1 and PS 7 profile paths.
+# 5. Enterprise admin modules - M365 / Azure / hybrid.
+#
+# These are large. Microsoft.Graph and Az each pull dozens of submodules.
+# Skip with -Minimal or -NoAdminModules if not actually administering
+# M365 / Azure / hybrid environments.
+# -----------------------------------------------------------------------------
+if ((-not $Minimal) -and (-not $NoAdminModules)) {
+    Write-Step 'Installing M365 / Azure / hybrid admin modules (LARGE - may take several minutes)'
+    Write-Skip 'AzureAD and MSOnline are deprecated by Microsoft - using Microsoft.Graph instead'
+
+    # M365 / Graph - modern replacement for AzureAD + MSOnline.
+    Install-PSModule -Name Microsoft.Graph
+
+    # Exchange Online, Security & Compliance, EOP, MDO.
+    Install-PSModule -Name ExchangeOnlineManagement
+
+    # Teams admin.
+    Install-PSModule -Name MicrosoftTeams
+
+    # SharePoint Online admin.
+    Install-PSModule -Name Microsoft.Online.SharePoint.PowerShell
+
+    # PnP (M365 / SharePoint / Teams / Graph - very widely used in the community).
+    Install-PSModule -Name PnP.PowerShell
+
+    # Azure.
+    Install-PSModule -Name Az
+
+    # Windows Update management from PowerShell.
+    Install-PSModule -Name PSWindowsUpdate
+
+    # Excel reporting without needing Excel installed.
+    Install-PSModule -Name ImportExcel
+} else {
+    Write-Skip 'Skipping enterprise admin modules (use no flags / drop -NoAdminModules to install them)'
+}
+
+# -----------------------------------------------------------------------------
+# 6. RSAT capabilities - Active Directory / DNS / DHCP / Group Policy.
+#
+# Required to manage AD, DNS, DHCP, GPOs, and other server roles from this
+# workstation. Installed via Add-WindowsCapability (needs elevation).
+# -----------------------------------------------------------------------------
+if ((-not $Minimal) -and (-not $NoRSAT)) {
+    $isAdmin = Test-Admin
+    if ((-not $isAdmin) -or $NoAdmin) {
+        Write-Warn 'RSAT install needs admin (re-run elevated) or -NoAdmin was passed - skipping.'
+    } else {
+        $isServerSku = $false
+        try {
+            $isServerSku = (Get-CimInstance Win32_OperatingSystem -ErrorAction Stop).ProductType -ne 1
+        } catch {}
+
+        if ($isServerSku) {
+            Write-Warn 'Server SKU detected. Use `Install-WindowsFeature RSAT-*` instead - skipping client-style RSAT.'
+        } else {
+            Write-Step 'Installing RSAT capabilities (AD, DNS, DHCP, GroupPolicy, ServerManager)'
+            $rsatCapabilities = @(
+                'Rsat.ActiveDirectory.DS-LDS.Tools',
+                'Rsat.Dns.Tools',
+                'Rsat.DHCP.Tools',
+                'Rsat.GroupPolicy.Management.Tools',
+                'Rsat.ServerManager.Tools',
+                'Rsat.CertificateServices.Tools',
+                'Rsat.FileServices.Tools'
+            )
+            foreach ($cap in $rsatCapabilities) {
+                try {
+                    $match = Get-WindowsCapability -Online -Name "$cap*" -ErrorAction Stop |
+                        Select-Object -First 1
+                    if (-not $match) { Write-Warn "$cap not available on this OS"; continue }
+                    if ($match.State -eq 'Installed') { Write-Skip "$cap already installed"; continue }
+                    Add-WindowsCapability -Online -Name $match.Name -ErrorAction Stop | Out-Null
+                    Write-Ok "$cap installed"
+                } catch {
+                    Write-Warn "$cap install failed: $($_.Exception.Message)"
+                }
+            }
+        }
+    }
+} else {
+    Write-Skip 'Skipping RSAT capabilities (per -Minimal / -NoRSAT)'
+}
+
+# -----------------------------------------------------------------------------
+# 7. Wire the profile into PS 5.1 and PS 7 profile paths.
 # -----------------------------------------------------------------------------
 $installScript = Join-Path $PSScriptRoot 'install.ps1'
 if (Test-Path $installScript) {

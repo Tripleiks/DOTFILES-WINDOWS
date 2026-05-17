@@ -73,11 +73,38 @@ The setup script installs (or skips, if already present):
 - `hyperfine` - benchmark commands
 - `tldr` - one-screen cheat sheets for any command
 
-**PowerShell modules**
+**PowerShell modules (core)**
 - `PSReadLine` - autocomplete and history search
 - `Terminal-Icons` - file icons in directory listings
 - `posh-git` - git tab completion
 - `PSFzf` - Ctrl+T file / Ctrl+R history fuzzy pickers
+
+**PowerShell modules (enterprise admin — skip with `-NoAdminModules`)**
+
+For managing M365, Azure, and hybrid AD environments from this workstation:
+
+- `Microsoft.Graph` - the modern unified Graph SDK (replaces deprecated AzureAD and MSOnline)
+- `Az` - the Azure PowerShell umbrella (Az.Accounts, Az.Resources, Az.Compute, …)
+- `ExchangeOnlineManagement` - Exchange Online / EOP / Security & Compliance / Defender for O365
+- `MicrosoftTeams` - Teams admin
+- `Microsoft.Online.SharePoint.PowerShell` - SharePoint Online admin
+- `PnP.PowerShell` - community PnP module for M365 / SharePoint / Teams / Graph
+- `PSWindowsUpdate` - manage Windows Update from PowerShell
+- `ImportExcel` - read/write Excel without needing Excel installed (great for reports)
+
+Note: `AzureAD` and `MSOnline` are **deprecated** by Microsoft and intentionally not installed. Use `Microsoft.Graph` for the same functionality.
+
+**RSAT capabilities (only when running setup elevated; skip with `-NoRSAT`)**
+
+For managing on-premises and hybrid resources from this workstation:
+
+- `Rsat.ActiveDirectory.DS-LDS.Tools` - Active Directory module + ADUC / ADSI Edit
+- `Rsat.Dns.Tools` - DNS Manager + DnsServer module
+- `Rsat.DHCP.Tools` - DHCP module
+- `Rsat.GroupPolicy.Management.Tools` - GPMC + GroupPolicy module
+- `Rsat.ServerManager.Tools` - Server Manager
+- `Rsat.CertificateServices.Tools` - Certificate Authority tools
+- `Rsat.FileServices.Tools` - File Server tools
 
 **Font**
 - JetBrains Mono Nerd Font - so prompt icons render correctly. After install, set your terminal font to it (in Windows Terminal: Settings -> Profile -> Appearance -> Font face).
