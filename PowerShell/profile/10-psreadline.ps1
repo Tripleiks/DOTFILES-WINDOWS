@@ -105,6 +105,14 @@ Set-PSReadLineKeyHandler -Key F7 -BriefDescription 'History' -ScriptBlock {
 }
 
 # Auto-wrap selection in matching quotes/brackets.
+# DISABLED 27.07.2026: Dieser Handler hat wiederholt Befehle korrumpiert
+# (z.B. "-AutoSize" wurde zu "-\"''\"", Parameter-Werte wie "-NoWelcome"
+# landeten als falscher Tenant-Identifier). Vermutete Ursache: Buffer-
+# Manipulation (Replace/Insert/SetCursorPosition) funktioniert nicht
+# zuverlaessig mit der installierten PSReadLine-Version 2.0.0 (sehr alt,
+# das Profil ist eigentlich fuer 2.2+ ausgelegt). Auskommentiert, bis
+# PSReadLine aktualisiert und der Handler erneut getestet wurde.
+<#
 Set-PSReadLineKeyHandler -Key '"',"'" `
     -BriefDescription SmartInsertQuote `
     -LongDescription 'Insert paired quote, or wrap selection' `
@@ -122,5 +130,7 @@ Set-PSReadLineKeyHandler -Key '"',"'" `
         [Microsoft.PowerShell.PSConsoleReadLine]::Insert("$($key.KeyChar)$($key.KeyChar)")
         [Microsoft.PowerShell.PSConsoleReadLine]::SetCursorPosition($cursor + 1)
     }
+#>
+
 
 Remove-Variable psrlVersion, psrlOptions, predictionView -ErrorAction SilentlyContinue
